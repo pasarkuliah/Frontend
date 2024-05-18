@@ -44,7 +44,9 @@ class LoginScreen extends StatelessWidget{
               ),
               SizedBox(height: 20),
               ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.of(context).pushNamed("/homeP");
+                },
                 child: Text('Login'),
                 style: ElevatedButton.styleFrom(minimumSize: Size(double.infinity, 50)),
               ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 void main() {
   runApp(MyApp());
@@ -9,57 +10,65 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: HomeScreen(),
+      routes: {
+        '/ShoppingCart': (context) => ShoppingCartScreen(),
+        '/Wishlist': (context) => WishlistScreen(),
+      },
     );
   }
 }
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
+  @override
+  _HomeScreenState createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  int _selectedIndex = 0;
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+    switch (index) {
+      case 0:
+        // No navigation needed as we are already on the home page.
+        break;
+      case 1:
+        Navigator.of(context).pushNamed('/ShoppingCart');
+        break;
+      case 2:
+        Navigator.of(context).pushNamed('/Wishlist');
+        break;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            // Add navigation logic here
-          },
-        ),
-        title: Text('Home'),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
-        elevation: 0,
-        actions: [
-          IconButton(
-            icon: Icon(Icons.notifications),
-            onPressed: () {
-              // Add notification logic here
-            },
-          ),
-          IconButton(
-            icon: Icon(Icons.shopping_cart),
-            onPressed: () {
-              // Add shopping cart logic here
-            },
-          ),
-          CircleAvatar(
-            backgroundImage: AssetImage('assets/images/profile.jpg'),
-          ),
-        ],
-      ),
       body: SingleChildScrollView(
         child: Column(
           children: [
-            Padding(
-              padding: EdgeInsets.all(8),
-              child: TextField(
-                decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.search),
-                  hintText: 'Search',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
+            SizedBox(height: 40,),
+            Row(
+              children: [
+                Container(
+                  width: 332,
+                  padding: EdgeInsets.all(8),
+                  child: TextField(
+                    decoration: InputDecoration(
+                      prefixIcon: Icon(Icons.search),
+                      hintText: 'Search',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
                   ),
                 ),
-              ),
+                CircleAvatar(
+            backgroundImage: AssetImage('assets/images/profile.jpg'),
+          ),
+              ],
             ),
             Padding(
               padding: EdgeInsets.all(8),
@@ -102,17 +111,18 @@ class HomeScreen extends StatelessWidget {
             ),
             GridView.count(
               crossAxisCount: 2,
+              mainAxisSpacing: 100,
               shrinkWrap: true,
               physics: NeverScrollableScrollPhysics(),
               padding: EdgeInsets.all(8),
               children: [
                 ProductItem(
-                  imageUrl: 'assets/images/seragam_merah.png',
+                  imageUrl: 'assets/images/baju merah.jpg',
                   itemName: 'Seragam Telkom University (Merah)',
                   itemPrice: 125000,
                 ),
                 ProductItem(
-                  imageUrl: 'assets/images/seragam_putih.png',
+                  imageUrl: 'assets/images/baju putih.jpg',
                   itemName: 'Seragam Telkom University (Putih)',
                   itemPrice: 125000,
                 ),
@@ -127,7 +137,7 @@ class HomeScreen extends StatelessWidget {
                   itemPrice: 80000,
                 ),
                 ProductItem(
-                  imageUrl: 'assets/images/sepatu_hitam.png',
+                  imageUrl: 'assets/images/sepatu hitam.jpg',
                   itemName: 'Sepatu Hitam',
                   itemPrice: 170000,
                 ),
@@ -137,12 +147,12 @@ class HomeScreen extends StatelessWidget {
                   itemPrice: 15000,
                 ),
                 ProductItem(
-                  imageUrl: 'assets/images/rak_sepatu.png',
+                  imageUrl: 'assets/images/rak.jpg',
                   itemName: 'Rak Sepatu',
                   itemPrice: 70000,
                 ),
                 ProductItem(
-                  imageUrl: 'assets/images/lanyard.png',
+                  imageUrl: 'assets/images/lanyard.jpg',
                   itemName: 'Lanyard',
                   itemPrice: 50000,
                 ),
@@ -166,7 +176,8 @@ class HomeScreen extends StatelessWidget {
             label: 'Wishlist',
           ),
         ],
-        currentIndex: 0, // Set the current index to highlight the "Home" tab
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
       ),
     );
   }
@@ -224,6 +235,34 @@ class ProductItem extends StatelessWidget {
             label: Text('Add To Cart'),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class ShoppingCartScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Shopping Cart'),
+      ),
+      body: Center(
+        child: Text('Shopping Cart Screen'),
+      ),
+    );
+  }
+}
+
+class WishlistScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Wishlist'),
+      ),
+      body: Center(
+        child: Text('Wishlist Screen'),
       ),
     );
   }

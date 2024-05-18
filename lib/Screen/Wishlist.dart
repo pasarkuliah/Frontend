@@ -28,27 +28,27 @@ class WishlistScreen extends StatelessWidget {
         padding: EdgeInsets.all(8),
         children: [
           WishlistItem(
-            imageUrl: 'assets/images/seragam_telkom_university_putih.png',
+            imageUrl: 'assets/images/baju putih.png',
             itemName: 'Seragam Telkom University (Putih)',
             itemPrice: 125000,
           ),
           WishlistItem(
-            imageUrl: 'assets/images/rak_sepatu.png',
+            imageUrl: 'assets/images/rak.jpg',
             itemName: 'Rak Sepatu',
             itemPrice: 70000,
           ),
           WishlistItem(
-            imageUrl: 'assets/images/sofa_kuning.png',
+            imageUrl: 'assets/images/sofa kuning.jpg',
             itemName: 'Sofa Kuning',
             itemPrice: 1250000,
           ),
           WishlistItem(
-            imageUrl: 'assets/images/drone.png',
+            imageUrl: 'assets/images/drone.jpg',
             itemName: 'Drone',
             itemPrice: 8000000,
           ),
           WishlistItem(
-            imageUrl: 'assets/images/mouse_wireless.png',
+            imageUrl: 'assets/images/mouse.jpg',
             itemName: 'Mouse Wireless',
             itemPrice: 80000,
           ),
@@ -70,6 +70,15 @@ class WishlistScreen extends StatelessWidget {
           ),
         ],
         currentIndex: 2, // Set the current index to highlight the "Wishlist" tab
+        onTap: (index) {
+          if (index == 0) {
+            // Navigate to HomeScreen
+            Navigator.pushReplacementNamed(context, '/homeP');
+          } else if (index == 1) {
+            // Navigate to ShoppingCartScreen
+            Navigator.pushReplacementNamed(context, '/ShoppingCart');
+          }
+        },
       ),
     );
   }

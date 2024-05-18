@@ -60,6 +60,14 @@ class ShoppingCartScreen extends StatelessWidget {
             label: 'Wishlist',
           ),
         ],
+        currentIndex: 1,
+        onTap: (index) {
+          if (index == 0) {
+            Navigator.pushReplacementNamed(context, '/homeP');
+          }else if (index == 2) {
+            Navigator.pushReplacementNamed(context, '/Wishlist');
+          }
+        }
       ),
     );
   }
