@@ -201,8 +201,6 @@ class ProductItem extends StatelessWidget {
                   icon: Icon(Icons.shopping_cart),
                   label: Text('Add To Cart'),
                   style: ElevatedButton.styleFrom(
-                    primary: Colors.green,
-                    onPrimary: Colors.white,
                     padding: EdgeInsets.symmetric(vertical: 8),
                   ),
                 ),
