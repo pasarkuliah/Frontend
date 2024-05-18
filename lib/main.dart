@@ -14,11 +14,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Pasku',
       theme: ThemeData(
-        primaryColor: const Color(0xFF673AB7), // Ubah primary color sesuai keinginan Anda
+        primaryColor:
+            const Color(0xFF673AB7), // Ubah primary color sesuai keinginan Anda
         colorScheme: ColorScheme.light(
-          primary: const Color(0xFF673AB7), // Anda juga bisa menggunakan primary di dalam colorScheme jika diperlukan
+          primary: const Color(
+              0xFF673AB7), // Anda juga bisa menggunakan primary di dalam colorScheme jika diperlukan
         ),
         useMaterial3: true,
       ),
