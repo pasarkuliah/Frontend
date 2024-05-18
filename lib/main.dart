@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Pasar Kuliah (PasKu) test',
+      title: 'Pasar Kuliah (PasKu)',
       theme: ThemeData(
         primaryColor:
             const Color(0xFF673AB7), // Ubah primary color sesuai keinginan Anda
