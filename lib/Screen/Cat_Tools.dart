@@ -89,7 +89,7 @@ class CategoriesScreen extends StatelessWidget {
             label: 'Wishlist',
           ),
         ],
-        currentIndex: 0, // Set the current index to highlight the "Home" tab
+        currentIndex: 0,
       ),
     );
   }
