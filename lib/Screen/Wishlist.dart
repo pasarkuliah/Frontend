@@ -1,34 +1,22 @@
 import 'package:flutter/material.dart';
 
-void main() {
-  runApp(MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: WishlistScreen(),
-    );
-  }
-}
-
 class WishlistScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Wishlist'),
+        title: Center(child: Text('Wishlist')),
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
         elevation: 0,
+        automaticallyImplyLeading: false, // Remove the back arrow
       ),
       body: GridView.count(
         crossAxisCount: 2,
-        padding: EdgeInsets.all(8),
+        padding: EdgeInsets.all(16),
         children: [
           WishlistItem(
-            imageUrl: 'assets/images/baju putih.png',
+            imageUrl: 'assets/images/baju putih.jpg',
             itemName: 'Seragam Telkom University (Putih)',
             itemPrice: 125000,
           ),
@@ -69,7 +57,8 @@ class WishlistScreen extends StatelessWidget {
             label: 'Wishlist',
           ),
         ],
-        currentIndex: 2, // Set the current index to highlight the "Wishlist" tab
+        currentIndex:
+        2, // Set the current index to highlight the "Wishlist" tab
         onTap: (index) {
           if (index == 0) {
             // Navigate to HomeScreen
@@ -102,24 +91,30 @@ class WishlistItem extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Stack(
-            children: [
-              Image.asset(
-                imageUrl,
-                height: 100,
-                fit: BoxFit.cover,
+          Expanded(
+            child: AspectRatio(
+              aspectRatio: 1,
+              child: Stack(
+                children: [
+                  Image.asset(
+                    imageUrl,
+                    fit: BoxFit.cover,
+                    width: double
+                        .infinity, // Ensure the image covers the full width
+                  ),
+                  Positioned(
+                    top: 8,
+                    right: 8,
+                    child: IconButton(
+                      icon: Icon(Icons.favorite, color: Colors.red),
+                      onPressed: () {
+                        // Remove from wishlist logic
+                      },
+                    ),
+                  ),
+                ],
               ),
-              Positioned(
-                top: 8,
-                right: 8,
-                child: IconButton(
-                  icon: Icon(Icons.favorite, color: Colors.red),
-                  onPressed: () {
-                    // Remove from wishlist logic
-                  },
-                ),
-              ),
-            ],
+            ),
           ),
           Padding(
             padding: EdgeInsets.all(8),
@@ -148,7 +143,9 @@ class WishlistItem extends StatelessWidget {
                   icon: Icon(Icons.shopping_cart),
                   label: Text('Add To Cart'),
                   style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.white, backgroundColor: Colors.green,
+                    foregroundColor: Color.fromRGBO(255, 255, 255, 1),
+                    backgroundColor: Colors.green,
+                    minimumSize: Size(double.infinity, 36),
                     padding: EdgeInsets.symmetric(vertical: 8),
                   ),
                 ),
@@ -156,6 +153,45 @@ class WishlistItem extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+void main() {
+  runApp(MaterialApp(
+    home: WishlistScreen(),
+    routes: {
+      '/homeP': (context) => HomeScreen(), // Define your HomeScreen widget here
+      '/ShoppingCart': (context) =>
+          ShoppingCartScreen(), // Define your ShoppingCartScreen widget here
+    },
+  ));
+}
+
+class HomeScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Home'),
+      ),
+      body: Center(
+        child: Text('Home Screen'),
+      ),
+    );
+  }
+}
+
+class ShoppingCartScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Shopping Cart'),
+      ),
+      body: Center(
+        child: Text('Shopping Cart Screen'),
       ),
     );
   }

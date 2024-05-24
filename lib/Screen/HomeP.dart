@@ -1,87 +1,43 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
-void main() {
-  runApp(MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: HomeScreen(),
-      routes: {
-        '/ShoppingCart': (context) => ShoppingCartScreen(),
-        '/Wishlist': (context) => WishlistScreen(),
-      },
-    );
-  }
-}
-
-class HomeScreen extends StatefulWidget {
-  @override
-  _HomeScreenState createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
-  int _selectedIndex = 0;
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-    switch (index) {
-      case 0:
-        // No navigation needed as we are already on the home page.
-        break;
-      case 1:
-        Navigator.of(context).pushNamed('/ShoppingCart');
-        break;
-      case 2:
-        Navigator.of(context).pushNamed('/Wishlist');
-        break;
-    }
-  }
-
+class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
           children: [
-            SizedBox(height: 40,),
-            Row(
-              children: [
-                Container(
-                  width: 332,
-                  padding: EdgeInsets.all(8),
-                  child: TextField(
-                    decoration: InputDecoration(
-                      prefixIcon: Icon(Icons.search),
-                      hintText: 'Search',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(8, 20, 8, 8),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      decoration: InputDecoration(
+                        prefixIcon: Icon(Icons.search),
+                        hintText: 'Search',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
                       ),
                     ),
                   ),
-                ),
-                CircleAvatar(
-            backgroundImage: AssetImage('assets/images/profile.jpg'),
-          ),
-              ],
+                  SizedBox(width: 8),
+                  CircleAvatar(
+                    radius: 20,
+                    backgroundImage: AssetImage(
+                        'assets/images/profile.jpg'), // Path to profile image
+                  ),
+                ],
+              ),
             ),
             Padding(
-              padding: EdgeInsets.all(8),
+              padding: EdgeInsets.symmetric(horizontal: 8),
               child: Container(
                 width: double.infinity,
-                padding: EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.orange[100],
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  'Discount 50% OFF\nAll Members',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                child: Image.asset(
+                  'assets/images/bg.jpg', // Path to your background image
+                  fit: BoxFit.cover,
                 ),
               ),
             ),
@@ -91,10 +47,53 @@ class _HomeScreenState extends State<HomeScreen> {
                 scrollDirection: Axis.horizontal,
                 child: Row(
                   children: [
-                    CategoryChip(label: 'Stationary'),
-                    CategoryChip(label: 'Furniture'),
-                    CategoryChip(label: 'Tools'),
-                    CategoryChip(label: 'Attribute'),
+                    InkWell(
+                      onTap: () {
+                        Navigator.of(context).pushNamed("/Cat_Stationery");
+                      },
+                      child: Image.asset(
+                        'assets/images/Stationery.jpg',
+                        width: 100,
+                        height: 100,
+                        fit: BoxFit.contain,
+                      ),
+                    ),
+                    SizedBox(width: 8),
+                    InkWell(
+                      onTap: () {
+                        Navigator.of(context).pushNamed("/Cat_Furniture");
+                      },
+                      child: Image.asset(
+                        'assets/images/Furniture.jpg',
+                        width: 100,
+                        height: 100,
+                        fit: BoxFit.contain,
+                      ),
+                    ),
+                    SizedBox(width: 8),
+                    InkWell(
+                      onTap: () {
+                        Navigator.of(context).pushNamed("/Cat_Tools");
+                      },
+                      child: Image.asset(
+                        'assets/images/Tools.jpg',
+                        width: 100,
+                        height: 100,
+                        fit: BoxFit.contain,
+                      ),
+                    ),
+                    SizedBox(width: 8),
+                    InkWell(
+                      onTap: () {
+                        Navigator.of(context).pushNamed("/Cat_Attribute");
+                      },
+                      child: Image.asset(
+                        'assets/images/Attribute.jpg',
+                        width: 100,
+                        height: 100,
+                        fit: BoxFit.contain,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -111,10 +110,9 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             GridView.count(
               crossAxisCount: 2,
-              mainAxisSpacing: 100,
               shrinkWrap: true,
               physics: NeverScrollableScrollPhysics(),
-              padding: EdgeInsets.all(8),
+              padding: EdgeInsets.all(16),
               children: [
                 ProductItem(
                   imageUrl: 'assets/images/baju merah.jpg',
@@ -176,26 +174,20 @@ class _HomeScreenState extends State<HomeScreen> {
             label: 'Wishlist',
           ),
         ],
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-      ),
-    );
-  }
-}
-
-class CategoryChip extends StatelessWidget {
-  final String label;
-  final bool isSelected;
-
-  CategoryChip({required this.label, this.isSelected = false});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 4),
-      child: Chip(
-        label: Text(label),
-        backgroundColor: isSelected ? Colors.grey[400] : Colors.grey[200],
+        currentIndex: 0, // Set the current index to highlight the "Home" tab
+        onTap: (index) {
+          switch (index) {
+            case 0:
+              Navigator.pushReplacementNamed(context, '/');
+              break;
+            case 1:
+              Navigator.pushReplacementNamed(context, '/ShoppingCart');
+              break;
+            case 2:
+              Navigator.pushReplacementNamed(context, '/wishlist');
+              break;
+          }
+        },
       ),
     );
   }
@@ -216,53 +208,44 @@ class ProductItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Image.asset(imageUrl, fit: BoxFit.cover, height: 100),
+          Expanded(
+            child: Image.asset(
+              imageUrl,
+              fit: BoxFit.contain,
+              width: double.infinity,
+            ),
+          ),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Text(
               itemName,
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
             ),
           ),
-          Text(
-            'Rp. $itemPrice',
-            style: TextStyle(fontSize: 16, color: Colors.red),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: Text(
+              'Rp. $itemPrice',
+              style: TextStyle(fontSize: 14, color: Colors.red),
+            ),
           ),
-          ElevatedButton.icon(
-            onPressed: () {},
-            icon: Icon(Icons.shopping_cart),
-            label: Text('Add To Cart'),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ElevatedButton.icon(
+              onPressed: () {},
+              icon: Icon(Icons.shopping_cart),
+              label: Text('Add To Cart'),
+              style: ElevatedButton.styleFrom(
+                foregroundColor: Color.fromRGBO(255, 255, 255, 1),
+                backgroundColor: Colors.green,
+                minimumSize: Size(double.infinity, 36),
+                padding: EdgeInsets.symmetric(vertical: 8),
+              ),
+            ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class ShoppingCartScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Shopping Cart'),
-      ),
-      body: Center(
-        child: Text('Shopping Cart Screen'),
-      ),
-    );
-  }
-}
-
-class WishlistScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Wishlist'),
-      ),
-      body: Center(
-        child: Text('Wishlist Screen'),
       ),
     );
   }
