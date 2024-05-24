@@ -8,17 +8,17 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: BillingInformation(),
+      home: BillingInformationScreen(),
     );
   }
 }
 
-class BillingInformation extends StatefulWidget {
+class BillingInformationScreen extends StatefulWidget {
   @override
   _BillingInformationState createState() => _BillingInformationState();
 }
 
-class _BillingInformationState extends State<BillingInformation> {
+class _BillingInformationState extends State<BillingInformationScreen> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
   final TextEditingController _cityController = TextEditingController();
@@ -28,9 +28,9 @@ class _BillingInformationState extends State<BillingInformation> {
   @override
   Widget build(BuildContext context) {
     var styleFrom = ElevatedButton.styleFrom(
-                   backgroundColor: Colors.blue,
-                  padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
-                );
+      backgroundColor: Colors.blue,
+      padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+    );
     var styleFrom2 = styleFrom;
     return Scaffold(
       appBar: AppBar(

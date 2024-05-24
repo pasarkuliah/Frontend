@@ -3,6 +3,12 @@ import 'package:nama_proyek/Screen/HomeP.dart';
 import 'package:nama_proyek/Screen/Splash_screen.dart';
 import 'package:nama_proyek/Screen/ShoppingCart.dart' as ShoppingCart;
 import 'package:nama_proyek/Screen/Wishlist.dart' as Wishlist;
+import 'package:nama_proyek/Screen/BillingInfo.dart';
+import 'package:nama_proyek/Screen/Billing.dart';
+import 'package:nama_proyek/Screen/Cat_Stationery.dart' as Stationery;
+import 'package:nama_proyek/Screen/Cat_Furniture.dart' as Furniture;
+import 'package:nama_proyek/Screen/Cat_Tools.dart' as Tools;
+import 'package:nama_proyek/Screen/Cat_Tools.dart' as Attribute;
 
 void main() {
   runApp(const MyApp());
@@ -16,11 +22,9 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Pasar Kuliah (PasKu)',
       theme: ThemeData(
-        primaryColor:
-            const Color(0xFF673AB7), // Ubah primary color sesuai keinginan Anda
+        primaryColor: const Color(0xFF673AB7),
         colorScheme: ColorScheme.light(
-          primary: const Color(
-              0xFF673AB7), // Anda juga bisa menggunakan primary di dalam colorScheme jika diperlukan
+          primary: const Color(0xFF673AB7),
         ),
         useMaterial3: true,
       ),
@@ -29,7 +33,13 @@ class MyApp extends StatelessWidget {
       routes: {
         "/homeP": (context) => HomeScreen(),
         "/ShoppingCart": (context) => ShoppingCart.ShoppingCartScreen(),
-        "/Wishlist": (context) => Wishlist.WishlistScreen(),
+        "/wishlist": (context) => Wishlist.WishlistScreen(),
+        "/BillingInfo": (context) => BillingInformationScreen(),
+        "/Billing": (context) => ConfirmationScreen(),
+        "/Cat_Stationery": (context) => Stationery.CategoriesScreen(),
+        "/Cat_Furniture": (context) => Furniture.CategoriesScreen(),
+        "/Cat_Tools": (context) => Tools.CategoriesScreen(),
+        "/Cat_Attribute": (context) => Attribute.CategoriesScreen(),
       },
     );
   }

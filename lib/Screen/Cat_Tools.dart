@@ -8,109 +8,182 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          leading: Icon(Icons.arrow_back),
-          title: Text('Tools'),
-          actions: [
-            Icon(Icons.search),
-          ],
+      home: CategoriesScreen(),
+    );
+  }
+}
+
+class CategoriesScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            // Add navigation logic here
+          },
         ),
-        body: ToolsPage(),
+        title: Text('Tools'),
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black,
+        elevation: 0,
+      ),
+      body: Column(
+        children: [
+          Padding(
+            padding: EdgeInsets.all(8),
+            child: TextField(
+              decoration: InputDecoration(
+                prefixIcon: Icon(Icons.search),
+                hintText: 'Search',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+            ),
+          ),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                CategoryChip(label: 'Stationary', isSelected: true),
+                CategoryChip(label: 'Furniture'),
+                CategoryChip(label: 'Tools'),
+                CategoryChip(label: 'Attribute'),
+              ],
+            ),
+          ),
+          Expanded(
+            child: GridView.count(
+              crossAxisCount: 2,
+              padding: EdgeInsets.all(8),
+              children: [
+                ProductItem(
+                  imageUrl: 'assets/images/sapu.jpg',
+                  itemName: 'Sapu',
+                  itemPrice: 18000,
+                ),
+                ProductItem(
+                  imageUrl: 'assets/images/drone.jpg',
+                  itemName: 'Drone',
+                  itemPrice: 8000000,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        items: [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.shopping_cart),
+            label: 'Cart',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.favorite),
+            label: 'Wishlist',
+          ),
+        ],
+        currentIndex: 0, // Set the current index to highlight the "Home" tab
       ),
     );
   }
 }
 
-class ToolsPage extends StatelessWidget {
-  final List<Item> items = [
-    Item(name: 'Sapu Pembersih Lantai Fiber', price: 18000, image: 'assets/sapu.jpg'),
-    Item(name: 'Drone', price: 8000000, image: 'assets/drone.jpg'),
-    Item(name: 'Mouse Wireless', price: 80000, image: 'assets/mouse.jpg'),
-    Item(name: 'Sofa Putih', price: 1300000, image: 'assets/sofa.jpg'),
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              CategoryButton(label: 'Stationary'),
-              CategoryButton(label: 'Furniture'),
-              CategoryButton(label: 'Tools'),
-              CategoryButton(label: 'Attribute'),
-            ],
-          ),
-        ),
-        Expanded(
-          child: GridView.builder(
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              childAspectRatio: 0.75,
-            ),
-            itemCount: items.length,
-            itemBuilder: (context, index) {
-              return ItemCard(item: items[index]);
-            },
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class CategoryButton extends StatelessWidget {
+class CategoryChip extends StatelessWidget {
   final String label;
+  final bool isSelected;
 
-  CategoryButton({required this.label});
+  CategoryChip({required this.label, this.isSelected = false});
 
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton(
-      onPressed: () {},
-      child: Text(label),
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 4),
+      child: Chip(
+        label: Text(label),
+        backgroundColor: isSelected ? Colors.grey[400] : Colors.grey[200],
+      ),
     );
   }
 }
 
-class Item {
-  final String name;
-  final int price;
-  final String image;
+class ProductItem extends StatelessWidget {
+  final String imageUrl;
+  final String itemName;
+  final int itemPrice;
 
-  Item({required this.name, required this.price, required this.image});
-}
-
-class ItemCard extends StatelessWidget {
-  final Item item;
-
-  ItemCard({required this.item});
+  ProductItem({
+    required this.imageUrl,
+    required this.itemName,
+    required this.itemPrice,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Card(
+      margin: EdgeInsets.all(8),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Image.asset(item.image, fit: BoxFit.cover, height: 100),
+          Stack(
+            children: [
+              Image.asset(
+                imageUrl,
+                height: 100,
+                fit: BoxFit.cover,
+              ),
+              Positioned(
+                top: 8,
+                right: 8,
+                child: IconButton(
+                  icon: Icon(Icons.favorite_border, color: Colors.red),
+                  onPressed: () {
+                    // Add to wishlist logic
+                  },
+                ),
+              ),
+            ],
+          ),
           Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(
-              item.name,
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            padding: EdgeInsets.all(8),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  itemName,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'Rp.${itemPrice.toString()}',
+                  style: TextStyle(
+                    color: Colors.red,
+                  ),
+                ),
+                SizedBox(height: 8),
+                ElevatedButton.icon(
+                  onPressed: () {
+                    // Add to cart logic
+                  },
+                  icon: Icon(Icons.shopping_cart),
+                  label: Text('Add To Cart'),
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    backgroundColor: Colors.green,
+                    padding: EdgeInsets.symmetric(vertical: 8),
+                  ),
+                ),
+              ],
             ),
-          ),
-          Text(
-            'Rp. ${item.price}',
-            style: TextStyle(fontSize: 16, color: Colors.red),
-          ),
-          ElevatedButton.icon(
-            onPressed: () {},
-            icon: Icon(Icons.shopping_cart),
-            label: Text('Add To Cart'),
           ),
         ],
       ),
