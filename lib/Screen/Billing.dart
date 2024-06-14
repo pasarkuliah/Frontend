@@ -3,7 +3,8 @@ import 'package:url_launcher/url_launcher.dart';
 
 class ConfirmationScreen extends StatelessWidget {
   void _openWhatsApp() async {
-    String url = 'https://wa.me/+6281375330581';
+    String url =
+        'https://wa.me/+6281375330581?text=Halo%20saya%20ingin%20mengetahui%20informasi%20terkait%20status%20pengiriman%20barang%20saya';
     if (await canLaunch(url)) {
       await launch(url);
     } else {
@@ -53,7 +54,7 @@ class ConfirmationScreen extends StatelessWidget {
                   _openWhatsApp();
                 },
                 child: Text(
-                  'Jika Anda ingin menanyakan informasi terkait pesanan Anda, dapat menghubungi nomor berikut WhatsApp : 0813-7533-0581',
+                  'Informasi Lebih Lanjut (KLIK DISINI)',
                   textAlign: TextAlign.center,
                   style: TextStyle(color: Colors.blue, fontSize: 16),
                 ),
