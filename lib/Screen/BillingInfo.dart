@@ -1,20 +1,13 @@
-
 import 'package:flutter/material.dart';
-
-void main() {
-  runApp(MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: BillingInformationScreen(),
-    );
-  }
-}
+import 'package:nama_proyek/api/apiclient.dart';
+import 'package:nama_proyek/resposne/cart_response.dart';
 
 class BillingInformationScreen extends StatefulWidget {
+  final List<Cart> cartItems;
+
+  const BillingInformationScreen({Key? key, required this.cartItems})
+      : super(key: key);
+
   @override
   _BillingInformationState createState() => _BillingInformationState();
 }
@@ -25,6 +18,49 @@ class _BillingInformationState extends State<BillingInformationScreen> {
   final TextEditingController _cityController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   String? _selectedPaymentMethod;
+
+  Future<void> _submitOrder() async {
+    final name = _nameController.text;
+    final address = _addressController.text;
+    final city = _cityController.text;
+    final phone = _phoneController.text;
+
+    if (name.isNotEmpty &&
+        address.isNotEmpty &&
+        city.isNotEmpty &&
+        phone.isNotEmpty &&
+        _selectedPaymentMethod != null) {
+      final success = await ApiClient.checkoutProcess(
+        name: name,
+        address: address,
+        city: city,
+        phone: phone,
+        paymentMethod: _selectedPaymentMethod!,
+        cartItems: widget.cartItems,
+      );
+
+      if (success) {
+        // Navigasi ke layar pembayaran berhasil
+        Navigator.of(context).pushNamed('/Billing');
+      } else {
+        // Tampilkan pesan kesalahan jika checkout gagal
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('ops kamu sudah melakukan checkout di cart ini.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } else {
+      // Tampilkan pesan jika ada input yang kosong
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Please fill all fields and select payment method.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +74,7 @@ class _BillingInformationState extends State<BillingInformationScreen> {
         title: Text('Billing Information'),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
-            onPressed: () {
+          onPressed: () {
             Navigator.of(context).pushNamed("/ShoppingCart");
           },
         ),
@@ -100,9 +136,7 @@ class _BillingInformationState extends State<BillingInformationScreen> {
             SizedBox(height: 40),
             Center(
               child: InkWell(
-                onTap: () {
-                  Navigator.of(context).pushNamed("/Billing");
-                },
+                onTap: _submitOrder,
                 child: Container(
                   padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
                   decoration: BoxDecoration(

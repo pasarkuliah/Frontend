@@ -1,19 +1,68 @@
 import 'package:flutter/material.dart';
+import 'package:nama_proyek/api/apiclient.dart';
+import 'package:nama_proyek/globals.dart';
+import 'package:nama_proyek/resposne/category.dart';
+import 'package:nama_proyek/resposne/product_category_response.dart';
 
-void main() {
-  runApp(MyApp());
-}
-
-class MyApp extends StatelessWidget {
+class CategoriesScreen extends StatefulWidget {
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: CategoriesScreen(),
-    );
-  }
+  State<CategoriesScreen> createState() => _CategoriesScreenState();
 }
 
-class CategoriesScreen extends StatelessWidget {
+class _CategoriesScreenState extends State<CategoriesScreen> {
+  List<Product> products = [];
+  List<Product> filteredProducts = [];
+  bool isLoading = true;
+  TextEditingController searchController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    print("init state");
+    searchController.addListener(_onSearchChanged);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    getProducts();
+  }
+
+  @override
+  void dispose() {
+    searchController.dispose();
+    super.dispose();
+  }
+
+  void _onSearchChanged() {
+    filterProducts();
+  }
+
+  Future getProducts() async {
+    print("get data");
+    var res = await ApiClient.getProductByCategory(context, 2);
+    if (res != null) {
+      setState(() {
+        products = res.data!.products!;
+        filteredProducts = products;
+        isLoading = false;
+      });
+    } else {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  void filterProducts() {
+    String query = searchController.text.toLowerCase();
+    setState(() {
+      filteredProducts = products
+          .where((product) => product.name!.toLowerCase().contains(query))
+          .toList();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -34,6 +83,7 @@ class CategoriesScreen extends StatelessWidget {
           Padding(
             padding: EdgeInsets.all(8),
             child: TextField(
+              controller: searchController,
               decoration: InputDecoration(
                 prefixIcon: Icon(Icons.search),
                 hintText: 'Search',
@@ -47,40 +97,40 @@ class CategoriesScreen extends StatelessWidget {
             scrollDirection: Axis.horizontal,
             child: Row(
               children: [
-                CategoryChip(label: 'Stationary'),
-                CategoryChip(label: 'Furniture'),
-                CategoryChip(label: 'Tools', isSelected: true),
+                CategoryChip(
+                  label: 'Stationary',
+                ),
+                CategoryChip(
+                  label: 'Furniture',
+                  isSelected: true,
+                ),
+                CategoryChip(label: 'Tools'),
                 CategoryChip(label: 'Attribute'),
               ],
             ),
           ),
           Expanded(
-            child: GridView.count(
-              crossAxisCount: 2,
-              padding: EdgeInsets.all(8),
-              children: [
-                ProductItem(
-                  imageUrl: 'assets/images/sapu.jpg',
-                  itemName: 'Sapu Pembersih Lantai Fiber',
-                  itemPrice: 18000,
-                ),
-                ProductItem(
-                  imageUrl: 'assets/images/drone.jpg',
-                  itemName: 'Drone',
-                  itemPrice: 8000000,
-                ),
-                ProductItem(
-                  imageUrl: 'assets/images/mouse.jpg',
-                  itemName: 'Mouse Wireless',
-                  itemPrice: 80000,
-                ),
-                ProductItem(
-                  imageUrl: 'assets/images/sofa.jpg',
-                  itemName: 'Sofa Putih',
-                  itemPrice: 1300000,
-                ),
-              ],
-            ),
+            child: isLoading
+                ? Center(child: CircularProgressIndicator())
+                : GridView.builder(
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      mainAxisSpacing: 8,
+                      crossAxisSpacing: 8,
+                      childAspectRatio: (200 / 300),
+                    ),
+                    itemCount: filteredProducts.length,
+                    itemBuilder: (context, index) {
+                      final product = filteredProducts[index];
+                      return ProductItem(
+                        imageUrl: "${ApiClient.baseUrl}${product.imageUrl!}",
+                        itemName: product.name!,
+                        itemPrice: product.price!.toInt(),
+                        productId: product.id!,
+                      );
+                    },
+                    padding: EdgeInsets.all(8),
+                  ),
           ),
         ],
       ),
@@ -140,34 +190,60 @@ class ProductItem extends StatelessWidget {
   final String imageUrl;
   final String itemName;
   final int itemPrice;
+  final int productId;
 
-  ProductItem({
-    required this.imageUrl,
-    required this.itemName,
-    required this.itemPrice,
-  });
+  ProductItem(
+      {required this.imageUrl,
+      required this.itemName,
+      required this.itemPrice,
+      required this.productId});
 
   @override
   Widget build(BuildContext context) {
     return Card(
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Image.asset(imageUrl, fit: BoxFit.cover, height: 100),
+          Expanded(
+            child: Image.network(
+              imageUrl,
+              height: 200,
+              fit: BoxFit.cover,
+              width: double.infinity,
+            ),
+          ),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Text(
               itemName,
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
             ),
           ),
-          Text(
-            'Rp. $itemPrice',
-            style: TextStyle(fontSize: 16, color: Colors.red),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: Text(
+              'Rp. ${itemPrice.toStringAsFixed(2)}',
+              style: TextStyle(fontSize: 14, color: Colors.red),
+            ),
           ),
-          ElevatedButton.icon(
-            onPressed: () {},
-            icon: Icon(Icons.shopping_cart),
-            label: Text('Add To Cart'),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ElevatedButton.icon(
+              onPressed: () async {
+                var res = await ApiClient.addToCart(context, productId);
+                if (res) {
+                  showSnackBarSuccess(context, 'Product added to cart');
+                }
+              },
+              icon: Icon(Icons.shopping_cart),
+              label: Text('Add To Cart'),
+              style: ElevatedButton.styleFrom(
+                foregroundColor: Color.fromRGBO(255, 255, 255, 1),
+                backgroundColor: Colors.green,
+                minimumSize: Size(double.infinity, 36),
+                padding: EdgeInsets.symmetric(vertical: 8),
+              ),
+            ),
           ),
         ],
       ),

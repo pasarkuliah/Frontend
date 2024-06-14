@@ -1,32 +1,16 @@
 import 'package:flutter/material.dart';
-
-void main() {
-  runApp(MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back, color: Colors.black),
-            onPressed: () {
-              // Handle back action
-            },
-          ),
-          title: Text('Back To Home', style: TextStyle(color: Colors.black)),
-          backgroundColor: Colors.white,
-          elevation: 0,
-        ),
-        body: ConfirmationScreen(),
-      ),
-    );
-  }
-}
+import 'package:url_launcher/url_launcher.dart';
 
 class ConfirmationScreen extends StatelessWidget {
+  void _openWhatsApp() async {
+    String url = 'https://wa.me/+6281375330581';
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -66,9 +50,10 @@ class ConfirmationScreen extends StatelessWidget {
               child: TextButton(
                 onPressed: () {
                   // Add WhatsApp deep link or functionality
+                  _openWhatsApp();
                 },
                 child: Text(
-                  'Jika Anda ingin menanyakan informasi terkait pesanan Anda, dapat menghubungi nomor berikut WhatsApp : 082257568458',
+                  'Jika Anda ingin menanyakan informasi terkait pesanan Anda, dapat menghubungi nomor berikut WhatsApp : 0813-7533-0581',
                   textAlign: TextAlign.center,
                   style: TextStyle(color: Colors.blue, fontSize: 16),
                 ),

@@ -1,167 +1,262 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:nama_proyek/api/apiclient.dart';
+import 'package:nama_proyek/globals.dart';
+import 'package:nama_proyek/resposne/category.dart';
+import 'package:nama_proyek/resposne/product.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  List<Product> products = [];
+  List<Category> categories = [];
+  List<Product> filteredProducts = [];
+
+  String _selectedFilter = 'None';
+  String _selectedSort = 'None';
+
+  Future<void> geProducts() async {
+    try {
+      final response = await ApiClient.getProducts(context);
+      if (products.isEmpty) {
+        setState(() {
+          products = response!.data!;
+          filteredProducts = List.from(products);
+        });
+      }
+    } catch (error) {
+      print('Error fetching products: $error');
+    }
+  }
+
+  void _searchProducts(String query) {
+    setState(() {
+      filteredProducts = products
+          .where((product) =>
+              product.name!.toLowerCase().contains(query.toLowerCase()))
+          .toList();
+      _applyFilters();
+    });
+  }
+
+  void _applyFilters() {
+    if (_selectedFilter == 'Price Ascending') {
+      filteredProducts.sort((a, b) => a.price!.compareTo(b.price!));
+    } else if (_selectedFilter == 'Price Descending') {
+      filteredProducts.sort((a, b) => b.price!.compareTo(a.price!));
+    }
+
+    if (_selectedSort == 'Name Ascending') {
+      filteredProducts.sort((a, b) => a.name!.compareTo(b.name!));
+    } else if (_selectedSort == 'Name Descending') {
+      filteredProducts.sort((a, b) => b.name!.compareTo(a.name!));
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getCategories();
+    geProducts();
+  }
+
+  void getCategories() async {
+    var res = await ApiClient.getCategories(context);
+    if (res != null) {
+      setState(() {
+        res.data!.forEach((element) {
+          print(element.imageUrl);
+        });
+        categories = res.data!;
+      });
+    }
+  }
+
+  Future<void> _updateCart() async {
+    products.clear();
+    await geProducts();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(8, 20, 8, 8),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      decoration: InputDecoration(
-                        prefixIcon: Icon(Icons.search),
-                        hintText: 'Search',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
+      body: RefreshIndicator(
+        onRefresh: () => geProducts(),
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(8, 20, 8, 8),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        onChanged: _searchProducts,
+                        decoration: InputDecoration(
+                          prefixIcon: Icon(Icons.search),
+                          hintText: 'Search',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  SizedBox(width: 8),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.of(context).pushNamed("/Profile");
-                    },
-                    child: CircleAvatar(
-                      radius: 20,
-                      backgroundImage: AssetImage('assets/images/profile.jpg'), // Path to profile image
-                    ),
-                  )
-
-                ],
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 8),
-              child: Container(
-                width: double.infinity,
-                child: Image.asset(
-                  'assets/images/bg.jpg', // Path to your background image
-                  fit: BoxFit.cover,
+                    SizedBox(width: 8),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).pushNamed("/Profile");
+                      },
+                      child: CircleAvatar(
+                        radius: 20,
+                        backgroundImage:
+                            AssetImage('assets/images/profilee.jpg'),
+                      ),
+                    )
+                  ],
                 ),
               ),
-            ),
-            Padding(
-              padding: EdgeInsets.all(8),
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 8),
+                child: Container(
+                  width: double.infinity,
+                  child: Image.asset(
+                    'assets/images/bg.jpg',
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.all(8),
+                child: SizedBox(
+                  height: 90,
+                  width: double.infinity,
+                  child: ListView.separated(
+                    separatorBuilder: (context, index) => SizedBox(
+                      width: 25,
+                    ),
+                    itemCount: categories.length,
+                    scrollDirection: Axis.horizontal,
+                    shrinkWrap: true,
+                    itemBuilder: (context, index) => InkWell(
+                      onTap: () {
+                        Navigator.of(context).pushNamed(
+                            "/" + categories![index].name!,
+                            arguments: categories[index]);
+                      },
+                      child: Column(
+                        children: [
+                          SvgPicture.network(
+                            placeholderBuilder: (context) =>
+                                Icon(Icons.warning_outlined),
+                            '${ApiClient.baseUrl}${categories![index].imageUrl}',
+                            width: 70,
+                            height: 70,
+                            fit: BoxFit.contain,
+                          ),
+                          Text(categories![index].name!)
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.all(8),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'New Product',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
                 child: Row(
                   children: [
-                    InkWell(
-                      onTap: () {
-                        Navigator.of(context).pushNamed("/Cat_Stationery");
-                      },
-                      child: Image.asset(
-                        'assets/images/Stationery.jpg',
-                        width: 100,
-                        height: 100,
-                        fit: BoxFit.contain,
+                    Expanded(
+                      child: DropdownButton<String>(
+                        value: _selectedFilter,
+                        items: [
+                          DropdownMenuItem(
+                            value: 'None',
+                            child: Text('No Filter'),
+                          ),
+                          DropdownMenuItem(
+                            value: 'Price Ascending',
+                            child: Text('Price Ascending'),
+                          ),
+                          DropdownMenuItem(
+                            value: 'Price Descending',
+                            child: Text('Price Descending'),
+                          ),
+                        ],
+                        onChanged: (value) {
+                          setState(() {
+                            _selectedFilter = value!;
+                            _applyFilters();
+                          });
+                        },
                       ),
                     ),
                     SizedBox(width: 8),
-                    InkWell(
-                      onTap: () {
-                        Navigator.of(context).pushNamed("/Cat_Furniture");
-                      },
-                      child: Image.asset(
-                        'assets/images/Furniture.jpg',
-                        width: 100,
-                        height: 100,
-                        fit: BoxFit.contain,
-                      ),
-                    ),
-                    SizedBox(width: 8),
-                    InkWell(
-                      onTap: () {
-                        Navigator.of(context).pushNamed("/Cat_Tools");
-                      },
-                      child: Image.asset(
-                        'assets/images/Tools.jpg',
-                        width: 100,
-                        height: 100,
-                        fit: BoxFit.contain,
-                      ),
-                    ),
-                    SizedBox(width: 8),
-                    InkWell(
-                      onTap: () {
-                        Navigator.of(context).pushNamed("/Cat_Attribute");
-                      },
-                      child: Image.asset(
-                        'assets/images/Attribute.jpg',
-                        width: 100,
-                        height: 100,
-                        fit: BoxFit.contain,
+                    Expanded(
+                      child: DropdownButton<String>(
+                        value: _selectedSort,
+                        items: [
+                          DropdownMenuItem(
+                            value: 'None',
+                            child: Text('No Sort'),
+                          ),
+                          DropdownMenuItem(
+                            value: 'Name Ascending',
+                            child: Text('Name Ascending'),
+                          ),
+                          DropdownMenuItem(
+                            value: 'Name Descending',
+                            child: Text('Name Descending'),
+                          ),
+                        ],
+                        onChanged: (value) {
+                          setState(() {
+                            _selectedSort = value!;
+                            _applyFilters();
+                          });
+                        },
                       ),
                     ),
                   ],
                 ),
               ),
-            ),
-            Padding(
-              padding: EdgeInsets.all(8),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'New Product',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              GridView.builder(
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 10,
+                  mainAxisSpacing: 16,
+                  childAspectRatio: (200 / 300),
+                ),
+                shrinkWrap: true,
+                itemCount: filteredProducts.length,
+                physics: NeverScrollableScrollPhysics(),
+                padding: EdgeInsets.all(8),
+                itemBuilder: (context, index) => Container(
+                  child: ProductItem(
+                    imageUrl:
+                        "${ApiClient.baseUrl}${filteredProducts[index].imageUrl}",
+                    itemName: filteredProducts[index].name!,
+                    itemPrice: filteredProducts[index].price!.toInt(),
+                    productId: filteredProducts[index].id!,
+                    wishlist: filteredProducts[index].wishlist!,
+                    onUpdate: _updateCart,
+                  ),
                 ),
               ),
-            ),
-            GridView.count(
-              crossAxisCount: 2,
-              shrinkWrap: true,
-              physics: NeverScrollableScrollPhysics(),
-              padding: EdgeInsets.all(16),
-              children: [
-                ProductItem(
-                  imageUrl: 'assets/images/baju merah.jpg',
-                  itemName: 'Seragam Telkom University (Merah)',
-                  itemPrice: 125000,
-                ),
-                ProductItem(
-                  imageUrl: 'assets/images/baju putih.jpg',
-                  itemName: 'Seragam Telkom University (Putih)',
-                  itemPrice: 125000,
-                ),
-                ProductItem(
-                  imageUrl: 'assets/images/sapu.jpg',
-                  itemName: 'Sapu Pembersih Lantai Fiber',
-                  itemPrice: 18000,
-                ),
-                ProductItem(
-                  imageUrl: 'assets/images/mouse.jpg',
-                  itemName: 'Mouse Wireless',
-                  itemPrice: 80000,
-                ),
-                ProductItem(
-                  imageUrl: 'assets/images/sepatu hitam.jpg',
-                  itemName: 'Sepatu Hitam',
-                  itemPrice: 170000,
-                ),
-                ProductItem(
-                  imageUrl: 'assets/images/buku.jpg',
-                  itemName: 'Buku Tulis',
-                  itemPrice: 15000,
-                ),
-                ProductItem(
-                  imageUrl: 'assets/images/rak.jpg',
-                  itemName: 'Rak Sepatu',
-                  itemPrice: 70000,
-                ),
-                ProductItem(
-                  imageUrl: 'assets/images/lanyard.jpg',
-                  itemName: 'Lanyard',
-                  itemPrice: 50000,
-                ),
-              ],
-            ),
-          ],
+            ],
+          ),
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -179,7 +274,7 @@ class HomeScreen extends StatelessWidget {
             label: 'Wishlist',
           ),
         ],
-        currentIndex: 0, // Set the current index to highlight the "Home" tab
+        currentIndex: 0,
         onTap: (index) {
           switch (index) {
             case 0:
@@ -198,16 +293,29 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
-class ProductItem extends StatelessWidget {
+class ProductItem extends StatefulWidget {
   final String imageUrl;
   final String itemName;
   final int itemPrice;
+  final int productId;
+  final bool wishlist;
+  final VoidCallback onUpdate;
 
   ProductItem({
     required this.imageUrl,
     required this.itemName,
     required this.itemPrice,
+    required this.productId,
+    required this.wishlist,
+    required this.onUpdate,
   });
+
+  @override
+  State<ProductItem> createState() => _ProductItemState();
+}
+
+class _ProductItemState extends State<ProductItem> {
+  bool _isAddingToWishlist = false;
 
   @override
   Widget build(BuildContext context) {
@@ -216,35 +324,88 @@ class ProductItem extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Expanded(
-            child: Image.asset(
-              imageUrl,
-              fit: BoxFit.contain,
-              width: double.infinity,
+            child: Stack(
+              children: [
+                Image.network(
+                  widget.imageUrl,
+                  height: 200,
+                  fit: BoxFit.fill,
+                  width: double.infinity,
+                ),
+                Positioned(
+                  right: 0,
+                  top: 0,
+                  child: IconButton(
+                    onPressed: () async {
+                      if (widget.wishlist) {
+                        var res = await ApiClient.removeFromWishlist(
+                            widget.productId);
+                        if (res) {
+                          setState(() {
+                            _isAddingToWishlist = false;
+                          });
+                          widget.onUpdate();
+                          showSnackBarSuccess(
+                              context, 'Product remove from wishlist');
+                        }
+                      } else {
+                        setState(() {
+                          _isAddingToWishlist = true;
+                        });
+                        var res =
+                            await ApiClient.addToWishlist(widget.productId);
+                        if (res) {
+                          setState(() {
+                            _isAddingToWishlist = false;
+                          });
+                          widget.onUpdate();
+                          showSnackBarSuccess(
+                              context, 'Product added to wishlist');
+                        }
+                      }
+                    },
+                    icon: _isAddingToWishlist
+                        ? CircularProgressIndicator()
+                        : Icon(
+                            Icons.favorite,
+                            color: widget.wishlist ? Colors.red : Colors.grey,
+                          ),
+                  ),
+                ),
+              ],
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.symmetric(horizontal: 9.0),
             child: Text(
-              itemName,
+              widget.itemName,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
             ),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
             child: Text(
-              'Rp. $itemPrice',
+              'Rp. ${widget.itemPrice.toStringAsFixed(2)}',
               style: TextStyle(fontSize: 14, color: Colors.red),
             ),
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: ElevatedButton.icon(
-              onPressed: () {},
+              onPressed: () async {
+                var res = await ApiClient.addToCart(context, widget.productId);
+                if (res) {
+                  widget.onUpdate();
+                  showSnackBarSuccess(context, 'Product added to cart');
+                }
+              },
               icon: Icon(Icons.shopping_cart),
               label: Text('Add To Cart'),
               style: ElevatedButton.styleFrom(
-                foregroundColor: Color.fromRGBO(255, 255, 255, 1),
                 backgroundColor: Colors.green,
+                foregroundColor: Colors.white,
                 minimumSize: Size(double.infinity, 36),
                 padding: EdgeInsets.symmetric(vertical: 8),
               ),

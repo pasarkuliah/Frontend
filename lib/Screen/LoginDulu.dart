@@ -36,9 +36,12 @@ class LoginScreen extends StatelessWidget {
             Center(
               child: Column(
                 children: [
-                  Image.asset('assets/pasar_kuliah_logo.png', height: 100), // Replace with actual asset path
+                  Image.asset('assets/pasar_kuliah_logo.png',
+                      height: 100), // Replace with actual asset path
                   SizedBox(height: 40),
-                  Text('Login Dulu Yuk !!!', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                  Text('Login Dulu Yuk !!!',
+                      style:
+                          TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
                   SizedBox(height: 40),
                   ElevatedButton(
                     onPressed: () {

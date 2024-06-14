@@ -1,6 +1,5 @@
-
-
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   runApp(MyApp());
@@ -15,7 +14,30 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends StatefulWidget {
+  @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+  String username = '';
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getUsername();
+  }
+
+  void getUsername() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+
+    setState(() {
+      username =
+          sharedPreferences.getString('username') ?? 'failed to get username';
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     var styleFrom = ElevatedButton.styleFrom(
@@ -46,11 +68,12 @@ class ProfilePage extends StatelessWidget {
           SizedBox(height: 40),
           CircleAvatar(
             radius: 60,
-            backgroundImage: AssetImage('assets/images/profilee.jpg'), // Replace with actual user profile image asset path
+            backgroundImage: AssetImage(
+                'assets/images/profilee.jpg'), // Replace with actual user profile image asset path
           ),
           SizedBox(height: 20),
           Text(
-            'RayhanSani',
+            '${username}',
             style: TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 24,
@@ -58,12 +81,17 @@ class ProfilePage extends StatelessWidget {
           ),
           SizedBox(height: 40),
           ElevatedButton(
-            onPressed: () {
-              Navigator.of(context).pushNamed("/login");// Add logout functionality
+            onPressed: () async {
+              SharedPreferences sharedPreferences =
+                  await SharedPreferences.getInstance();
+              sharedPreferences.clear();
+              Navigator.of(context)
+                  .pushNamed("/login"); // Add logout functionality
             },
             style: styleFrom,
-            child: Text('Logout', style: TextStyle(color: const Color.fromARGB(255, 255, 255, 255))),
-            
+            child: Text('Logout',
+                style:
+                    TextStyle(color: const Color.fromARGB(255, 255, 255, 255))),
           ),
         ],
       ),
